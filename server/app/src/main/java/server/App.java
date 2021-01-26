@@ -30,7 +30,8 @@ public class App {
         String ans;
         
         try {
-            ans = String.format("%.5f", MathExpressionParser.parse(msg));
+            //ans = String.format("%.5f", MathExpressionParser.parse(msg));
+            ans = MathExpressionParser.parse(msg);
             System.out.println("Result: " + ans);
         } catch (NumberFormatException ex) {
             ans = "Invalid expression or unsupported operator";
