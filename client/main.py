@@ -1,5 +1,7 @@
 import socket, select, sys
 
+#  TODO: Structure
+
 TCP_ADDR = '127.0.0.1'
 TCP_PORT = 1610
 MAX_LENGTH = 4096
@@ -24,9 +26,7 @@ except:
 def send(msg):
     s.send(msg.encode("utf-8") + b'\n')
 
-data = s.recv(4096)
-
-if data == b'rdy\n':
+if s.recv(4096) == b'rdy\n':
     print("Connected to server!\n")
     print("Enter an expression, 'help' for a list of available commands or 'exit' to quit.")
 else:

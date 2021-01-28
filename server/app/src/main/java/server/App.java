@@ -21,7 +21,8 @@ public class App {
 
     public static void main(String[] args) {
         //System.out.println(new App().getGreeting());
-        new App().listener(1610);
+        new HTTPListener().run();
+        //new App().listener(1610);
         //new App().webServer(8080);
     }
 

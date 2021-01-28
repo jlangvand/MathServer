@@ -12,6 +12,7 @@ public class MathExpressionParser {
     static DoubleBinaryOperator div = (a, b) -> a / b;
     static DoubleBinaryOperator mul = (a, b) -> a * b;
     static DoubleBinaryOperator sub = (a, b) -> a - b;
+    static DoubleBinaryOperator pow = (a, b) -> Math.pow(a, b);
 
      // Functions
     static DoubleUnaryOperator root = a -> Math.sqrt(a);
@@ -32,6 +33,8 @@ public class MathExpressionParser {
 
         return arg;
     }
+
+    //private static String evaluateFun
 
     private static String evaluateGroup(String delimiter, DoubleBinaryOperator op, String arg) {
         System.out.println("In evaluateGroup()");
@@ -63,6 +66,9 @@ public class MathExpressionParser {
         return arg;
     }
 
+    /**
+     * Take a mathematical expression as input and compute it.    
+     */
     public static String parse(String expression) throws NumberFormatException {
         // Strip whitespace
         expression = expression.strip();
@@ -86,8 +92,9 @@ public class MathExpressionParser {
             expression = evaluateGroup("\\/", div, expression);
             expression = evaluateGroup("\\+", sum, expression);
             expression = evaluateGroup("\\-", sub, expression);
+            expression = evaluateGroup("\\*\\*", div, previous);
             expression = extractParentheses(expression);
-        } while (!expression.equals(previous) || !expression.matches("\\d+\\.?\\d*"));
+        } while (!expression.equals(previous) && !expression.matches("\\d+\\.?\\d*"));
 
         System.out.println("After evaluation: " + expression);
         return expression;
