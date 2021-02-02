@@ -7,6 +7,9 @@ import java.util.regex.Pattern;
 
 
 public class MathExpressionParser {
+    // Save previous result so we can recall it later
+    private String ans;
+    
      // Operators
     static DoubleBinaryOperator sum = (a, b) -> a + b;
     static DoubleBinaryOperator div = (a, b) -> a / b;
@@ -16,9 +19,14 @@ public class MathExpressionParser {
 
      // Functions
     static DoubleUnaryOperator root = a -> Math.sqrt(a);
-    
+
+    public MathExpressionParser() {
+        this.ans = "";
+    }
+
+    // TODO: Something broke this..
     private static String evaluateFunctions(String arg) {
-        String regex = "sqrt\\([0-9\\.]*\\)";
+        String regex = "sqrt\\(\\d+\\.?\\d*\\)";
         Pattern pattern = Pattern.compile(regex);
 
         Matcher matcher = pattern.matcher(arg);
@@ -38,7 +46,7 @@ public class MathExpressionParser {
 
     private static String evaluateGroup(String delimiter, DoubleBinaryOperator op, String arg) {
         System.out.println("In evaluateGroup()");
-        String regex = "\\d\\.?\\d*+" + delimiter + "\\d+\\.?\\d*";
+        String regex = "\\d+\\.?\\d*+" + delimiter + "\\d+\\.?\\d*";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(arg);
         while (matcher.find()) {
@@ -67,36 +75,58 @@ public class MathExpressionParser {
     }
 
     /**
-     * Take a mathematical expression as input and compute it.    
+     * Take a mathematical expression as input and compute it.
+     *
+     * As unrecognised symbols are ignored, it actually provides some sort of
+     * (very crude) support for symbolic expressions. The next step should maybe
+     * be to extend this to actually solve simple equations/algebraic
+     * expressions.
+     *
+     * Works fairly well now, though probably full of bugs.
      */
-    public static String parse(String expression) throws NumberFormatException {
+    public String parse(String expression) throws NumberFormatException {
         // Strip whitespace
         expression = expression.strip();
         System.out.println("Expression: " + expression);
 
-        // TODO: Add implicit '*'
-
-        // Evaluate functions
-        expression = evaluateFunctions(expression);
+        // TODO: Add implicit '*' as in 2(1+1) -> 2*(1+1)
 
         // Replace special sequences
-        expression = expression.replace("pi", "3.14159265");
-        expression = expression.replace("e", "2.7182818284");
+        //String regex_pi = Pattern.compile("((?<=\W)");
+        expression = expression.replace("pi", Double.toString(Math.PI));
+        expression = expression.replaceAll("e", Double.toString(Math.E));
+        expression = expression.replaceAll("ans", this.ans);
         System.out.println("After replacement: " + expression);
 
         // Evaluate groups
         String previous;
         do {
             previous = expression;
+            
+            // Evaluate functions
+            expression = evaluateFunctions(expression);
+
+            // Evaluate primitive operators
+            expression = evaluateGroup("\\^", pow, expression);
             expression = evaluateGroup("\\*", mul, expression);
             expression = evaluateGroup("\\/", div, expression);
             expression = evaluateGroup("\\+", sum, expression);
             expression = evaluateGroup("\\-", sub, expression);
-            expression = evaluateGroup("\\*\\*", div, previous);
-            expression = extractParentheses(expression);
-        } while (!expression.equals(previous) && !expression.matches("\\d+\\.?\\d*"));
 
+            // Remove parentheses
+            expression = extractParentheses(expression);
+        }
+
+        /*
+         * Repeat until the previous block does not change the expression
+         * or we are left with a single number.        
+         */
+        while (!expression.equals(previous) && !expression.matches("\\d+\\.?\\d*"));
+
+        // TODO: Round number to x digits
+        
         System.out.println("After evaluation: " + expression);
-        return expression;
+        this.ans = expression;
+        return this.ans;
     }
 }
