@@ -2,6 +2,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,python,gradle
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,python,gradle
 
+# Emacs
+.emacs*
+
 ### Java ###
 # Compiled class file
 *.class
